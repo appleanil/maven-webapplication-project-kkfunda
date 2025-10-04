@@ -47,7 +47,7 @@
 
 <header>
     <h1>🚀 Welcome to Prince world🚀</h1>
-    <h3>ANIL | Development | Consulting</h3>
+    <h3>ANIL | Kumar | Consulting</h3>
 </header>
 
 <div class="container">
