@@ -46,7 +46,7 @@
 <body>
 
 <header>
-    <h1>🚀 Welcome to Prince Anil Kumar 🚀</h1>
+    <h1>🚀 Welcome to Prince Anil🚀</h1>
     <h3>Training | Development | Consulting</h3>
 </header>
 
