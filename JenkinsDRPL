@@ -2,7 +2,7 @@ pipeline {
     agent any
     tools
     {
-      maven "maven-3.9.6"
+      maven "maven-3.9.9"
     }
      stages
      {
@@ -14,7 +14,7 @@ pipeline {
              git branch: 'anil-dev', url: 'https://github.com/appleanil/maven-webapplication-project-kkfunda.git'
           }
         } //stage  close
-        stage('Maven Build)
+        stage('Maven Build')
         {
         steps
         {
