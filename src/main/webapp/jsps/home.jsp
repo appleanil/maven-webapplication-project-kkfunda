@@ -47,7 +47,7 @@
 
 <header>
     <h1>🚀 Welcome to KK FUNDA DEVOPS SRE Portal 🚀</h1>
-    <h3>Training | Development | Consulting</h3>
+    <h3>Training | ANil | Consulting</h3>
 </header>
 
 <div class="container">
