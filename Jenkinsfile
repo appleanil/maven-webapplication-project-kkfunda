@@ -12,7 +12,7 @@ pipeline {
           steps
           {
              notifyBuild('STARTED')
-             git branch: 'anil-dev', url: 'https://github.com/appleanil/maven-webapplication-project-kkfunda.git'
+             git branch: 'anil-test', url: 'https://github.com/appleanil/maven-webapplication-project-kkfunda.git'
           }
         } //stage  close
         stage('Maven Build')
@@ -33,7 +33,7 @@ pipeline {
         {
            steps
            {
-              sh "mvn deploy"
+              sh "mvn clean deploy"
            }
         }  //stage ending
 
@@ -43,7 +43,7 @@ pipeline {
                 sh """
             curl -u anil:apple \
             --upload-file /var/lib/jenkins/workspace/anil-declartive-job/target/maven-web-application.war \
-            "http://13.204.84.180:9090/manager/text/deploy?path=/maven-web-application&update=true"
+            "http://3.108.59.180:9090/manager/text/deploy?path=/maven-web-application&update=true"
         """
             }
         }  //stage ending
