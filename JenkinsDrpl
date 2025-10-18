@@ -55,9 +55,12 @@ pipeline {
    
   }
 }
-}   //best practices add comments for pipeline ending
-    // Notification method
-    def notifyBuild(String buildStatus = 'STARTED') {
+
+
+} // pipeline ending
+
+// Notification method
+def notifyBuild(String buildStatus = 'STARTED') {
     buildStatus = buildStatus ?: 'SUCCESS'
 
     def colorCode
