@@ -75,5 +75,5 @@ pipeline {
             colorCode = '#FF0000' // Red
     }
 
-    slackSend(color: colorCode, message: summary, channel: "#anil-pro")
+    slackSend(color: colorCode, message: summary, channel: '#anil-pro')
 }
