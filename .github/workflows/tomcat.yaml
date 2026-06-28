@@ -1,26 +1,74 @@
-name: Simple Build and Deploy
-on:
-  workflow_dispatch:
+name: Maven and Tomcat Application
+
+on: workflow_dispatch
 
 jobs:
-  full:
+  Maven-Build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Setup the java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
           cache: maven
 
-      - run: mvn clean package
+      - name: Maven build the application
+        run: mvn clean package
 
-      - name: Deploy WAR to Tomcat
+      - name: Verify the War file
+        run: ls -l target/*.war
+
+      - name: Upload the Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-war
+          path: target/*.war
+
+  Maven-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Test the application
+        run: mvn test
+
+      - name: Test Result
+        run: echo "maven test successfull done"
+
+  Tomcat-Deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download the Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-war
+          path: target
+
+      - name: Verify the file
+        run: ls -l target/
+
+      - name: Deploy into Tomcat
         env:
           TOMCAT_URL: ${{ vars.TOMCAT_URL }}
-          TOMCAT_USERNAME: ${{ secrets.TOMCAT.USERNAME }}
-          TOMCAT_PASSWORD: ${{ secrets.TOMCAT.PASSWORD }}
+          TOMCAT_USERNAME: ${{ secrets.TOMCAT_USERNAME }}
+          TOMCAT_PASSWORD: ${{ secrets.TOMCAT_PASSWORD }}
         run: |
-          WAR=$(ls target/*.war | head -n 1)
-          curl -sS -u "${TOMCAT_USERNAME}:${TOMCAT_PASSWORD}" --upload-file "$WAR" "${TOMCAT_URL}/manager/text/deploy?path=/maven-web-application&update=true"
+            WAR=$(ls target/*.war | head -n 1)
+
+            curl -sS -u "${TOMCAT_USER}:${TOMCAT_PASS}" --upload-file "$WAR" "${TOMCAT_URL}/manager/text/deploy?path=/maven-web-application&update=true"
+
+      - name: Deployment Status
+        run: echo "pplication deployed successfully to Tomcat."
+      
+
+
+
+
+
+
+      
