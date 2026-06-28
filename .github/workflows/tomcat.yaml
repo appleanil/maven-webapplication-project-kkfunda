@@ -31,7 +31,7 @@ jobs:
 
   Maven-test:
     runs-on: ubuntu-latest
-
+    needs: Maven-Build
     steps:
       - name: Test the application
         run: mvn test
@@ -41,6 +41,7 @@ jobs:
 
   Tomcat-Deploy:
     runs-on: ubuntu-latest
+    needs: Maven-test
 
     steps:
       - name: Download the Artifact
