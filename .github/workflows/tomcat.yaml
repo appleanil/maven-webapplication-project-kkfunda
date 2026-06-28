@@ -18,9 +18,9 @@ jobs:
 
       - name: Deploy WAR to Tomcat
         env:
-          TOMCAT_URL: http://13.233.44.14:8080
-          TOMCAT_USERNAME: anil
-          TOMCAT_PASSWORD: admin
+          TOMCAT_URL: ${{ vars.TOMCAT_URL }}
+          TOMCAT_USERNAME: ${{ secrets.TOMCAT.USERNAME }}
+          TOMCAT_PASSWORD: ${{ secrets.TOMCAT.PASSWORD }}
         run: |
           WAR=$(ls target/*.war | head -n 1)
           curl -sS -u "${TOMCAT_USERNAME}:${TOMCAT_PASSWORD}" --upload-file "$WAR" "${TOMCAT_URL}/manager/text/deploy?path=/maven-web-application&update=true"
