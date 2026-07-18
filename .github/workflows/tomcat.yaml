@@ -48,4 +48,37 @@ jobs:
       - name: Status of test
         run: echo "Successfull done"
 
+  Deploy:
+    runs-on: ubuntu-latest
+    needs: Test
+
+    steps:
+      # Step 1: Download Build Artifact
+      - name: Download WAR Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-war
+          path: target
+
+      # Step 2: Verify Downloaded WAR
+      - name: List Downloaded Files
+        run: ls -l target/
+
+      # Step 3: Deploy WAR to Tomcat
+      - name: Deploy Application
+        env:
+          TOMCAT_URL: ${{ http://3.108.56.46:8080 }}
+          TOMCAT_USER: ${{ admin }}
+          TOMCAT_PASS: ${{ password }}
+        run: |
+          WAR_FILE=$(ls target/*.war | head -n 1)
+
+          curl -u "$TOMCAT_USER:$TOMCAT_PASS" \
+          --upload-file "$WAR_FILE" \
+          "$TOMCAT_URL/manager/text/deploy?path=/maven-web-application&update=true"
+
+      # Step 4: Deployment Success
+      - name: Deployment Completed
+        run: echo "Application deployed successfully to Tomcat."
+
   
