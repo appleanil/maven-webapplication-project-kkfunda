@@ -30,6 +30,7 @@ jobs:
 
   Test-Stage:
     runs-on: ubuntu-latest
+    needs: Build-Stage
 
     steps:
       - name: Checkout the Artifact
@@ -42,7 +43,7 @@ jobs:
           java-version: 17
 
       - name: Test the Goal
-        run: mvn test package
+        run: mvn test
 
       - name: Status of test
         run: echo "Successfull done"
