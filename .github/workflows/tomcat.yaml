@@ -67,9 +67,9 @@ jobs:
       # Step 3: Deploy WAR to Tomcat
       - name: Deploy Application
         env:
-          TOMCAT_URL: ${{ http://3.108.56.46:8080 }}
-          TOMCAT_USER: ${{ admin }}
-          TOMCAT_PASS: ${{ password }}
+          TOMCAT_URL: http://3.108.56.46:8080
+          TOMCAT_USER: admin
+          TOMCAT_PASS: password
         run: |
           WAR_FILE=$(ls target/*.war | head -n 1)
 
