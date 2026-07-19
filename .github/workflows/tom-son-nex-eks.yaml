@@ -121,8 +121,8 @@ jobs:
             <servers>
               <server>
                 <id>nexus</id>
-                <username>${{ secrets.NEXUS_USERNAME }}</username>
-                <password>${{ secrets.NEXUS_PASSWORD }}</password>
+                <username>admin</username>
+                <password>apple</password>
               </server>
             </servers>
           </settings>
