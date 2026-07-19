@@ -67,6 +67,15 @@ jobs:
       - name: Checkout the Code
         uses: actions/checkout@v4
 
+      - name: Download WAR
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-war
+          path: target
+
+      - name: Verify WAR
+        run: ls -lrth target/
+
       - name: Build Docker Image
         run: |
           docker build -t anildocker11/maven-web-application:latest .
