@@ -106,26 +106,30 @@ jobs:
     needs: SonarQube
 
     steps:
+      - uses: actions/checkout@v4
 
-      - name: Download Artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/setup-java@v4
         with:
-          name: maven-war
-          path: target
+          distribution: temurin
+          java-version: 17
 
-      - name: Upload WAR to Nexus
-        env:
-          NEXUS_URL: http://13.203.222.131:8081
-          USERNAME: admin
-          PASSWORD: apple
-          REPOSITORY: http://13.203.222.131:8081/repository/Jio-Release/
-
+      - name: Configure Maven Settings
         run: |
-          WAR=$(ls target/*.war)
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>nexus</id>
+                <username>${{ secrets.NEXUS_USERNAME }}</username>
+                <password>${{ secrets.NEXUS_PASSWORD }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
 
-          curl -v -u $USERNAME:$PASSWORD \
-          --upload-file $WAR \
-          $NEXUS_URL/repository/$REPOSITORY/$(basename $WAR)
+      - name: Deploy to Nexus
+        run: mvn clean deploy
 
           
 
