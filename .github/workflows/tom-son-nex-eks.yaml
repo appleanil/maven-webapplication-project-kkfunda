@@ -73,6 +73,14 @@ jobs:
           name: maven-war
           path: target
 
+      - name: Debug Runner
+        run: |
+            whoami
+            id
+            groups
+            ls -l /var/run/docker.sock
+            docker version   
+
       - name: Verify WAR
         run: ls -lrth target/
 
