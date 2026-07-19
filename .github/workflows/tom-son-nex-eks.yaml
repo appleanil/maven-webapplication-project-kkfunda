@@ -64,9 +64,9 @@ jobs:
 
       - name: Deploy the Application
         env:
-          TOMCAT-URL: http://3.110.120.221:8080
-          TOMCAT-USER: anil
-          TOMCAT-PASS: password
+          TOMCAT_URL: http://3.110.120.221:8080
+          TOMCAT_USER: anil
+          TOMCAT_PASS: password
 
         run: |
           WAR_FILE=$(ls target/*.war | head -n 1)
