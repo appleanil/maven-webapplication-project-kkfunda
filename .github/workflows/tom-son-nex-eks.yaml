@@ -1,4 +1,4 @@
-name: Tomcat Three stages Deployment
+name: Tomcat-SonarQube-Nexus-EKS
 
 on: workflow_dispatch
 
@@ -7,78 +7,85 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout the code
+      - name: Check-out the code
         uses: actions/checkout@v4
 
-      - name: Install the java and Maven
+      - name: Set-up the Java and Maven
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Build the Artifact
+      - name: Build the Application with Artifact
         run: mvn clean package
 
-      - name: Display the Artifact file
+      - name: Display the files
         run: ls -lrth target/
 
       - name: Upload the Artifact
         uses: actions/upload-artifact@v4
         with:
           name: maven-war
-          path: target/*.war
+          path: target
 
   Test-Stage:
     runs-on: ubuntu-latest
     needs: Build-Stage
 
     steps:
-      - name: Checkout the Artifact
+      - name: Check-out the code
         uses: actions/checkout@v4
 
-      - name: Install the java and maven
+      - name: Set-up the java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Test the Goal
+      - name: Test the Artifact
         run: mvn test
 
-      - name: Status of test
-        run: echo "Successfull done"
+      - name: Status of Test Artifact
+        run: echo "Successfully the test artifact is done"
 
-  Deploy:
+  Deploy-Stage:
     runs-on: ubuntu-latest
     needs: Test-Stage
 
     steps:
-      # Step 1: Download Build Artifact
-      - name: Download WAR Artifact
+      - name: Download the Artifact
         uses: actions/download-artifact@v4
         with:
           name: maven-war
           path: target
 
-      # Step 2: Verify Downloaded WAR
-      - name: List Downloaded Files
-        run: ls -l target/
+      - name: Display the donwload the Artifact
+        run: ls -lrth target/
 
-      # Step 3: Deploy WAR to Tomcat
-      - name: Deploy Application
+      - name: Deploy the Application
         env:
-          TOMCAT_URL: http://3.108.56.46:8080
-          TOMCAT_USER: admin
-          TOMCAT_PASS: password
+          TOMCAT-URL: http://3.110.120.221:8080
+          TOMCAT-USER: anil
+          TOMCAT-PASS: password
+
         run: |
           WAR_FILE=$(ls target/*.war | head -n 1)
 
           curl -u "$TOMCAT_USER:$TOMCAT_PASS" \
           --upload-file "$WAR_FILE" \
           "$TOMCAT_URL/manager/text/deploy?path=/maven-web-application&update=true"
+          
+      - name: Status of Deploy the Application
+        run: |
+          echo "Successfully deploy the Application done."
 
-      # Step 4: Deployment Success
-      - name: Deployment Completed
-        run: echo "Application deployed successfully to Tomcat."
 
-  
+
+
+
+
+
+
+
+
+        
