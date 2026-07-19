@@ -1,4 +1,4 @@
-name: Tomcat-SonarQube-Nexus
+name: Docker-CI
 
 on:
   workflow_dispatch:
@@ -9,10 +9,10 @@ jobs:
 # BUILD STAGE
 #=========================================
   Build-Stage:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
-      - name: Checkout the code
+      - name: Checkout the Code
         uses: actions/checkout@v4
 
       - name: Setup Java
@@ -37,11 +37,11 @@ jobs:
 # TEST STAGE
 #=========================================
   Test-Stage:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: Build-Stage
 
     steps:
-      - name: Checkout the code
+      - name: Checkout the Code
         uses: actions/checkout@v4
 
       - name: Setup Java
@@ -50,14 +50,31 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Execute Test Cases
+      - name: Run Unit Tests
         run: mvn test
 
       - name: Test Status
         run: echo "Tests Completed Successfully"
 
+#=========================================
+# DOCKER BUILD & PUSH
+#=========================================
+  Docker-Build:
+    runs-on: self-hosted
+    needs: Test-Stage
 
-            "$TOMCAT_URL/manager/text/deploy?path=/maven-web-application&update=true"
+    steps:
+      - name: Checkout the Code
+        uses: actions/checkout@v4
 
-      - name: Deployment Status
-        run: echo "Application Successfully Deployed to Tomcat"
+      - name: Build Docker Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_REPOSITORY }}:0.0.1 .
+
+      - name: Verify Docker Image
+        run: |
+          docker images
+
+      - name: Push Docker Image
+        run: |
+          docker push ${{ secrets.DOCKER_REPOSITORY }}:0.0.1
