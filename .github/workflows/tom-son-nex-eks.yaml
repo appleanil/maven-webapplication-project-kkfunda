@@ -79,6 +79,30 @@ jobs:
         run: |
           echo "Successfully deploy the Application done."
 
+  SonarQube:
+    runs-on: ubuntu-latest
+    needs: Deploy-Stage
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Set-up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: SonarQube Analysis
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.projectKey=maven-webapp \
+            -Dsonar.host.url=http://43.204.142.248:9000 \
+            -Dsonar.login=admin \
+            -Dsonar.password=apple
+          
+
+
 
 
 
