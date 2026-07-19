@@ -1,93 +1,73 @@
-name: Tomcat-SonarQube-Nexus-EKS
+name: Tomcat-SonarQube-Nexus
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
 
 jobs:
+
+#=========================================
+# BUILD STAGE
+#=========================================
   Build-Stage:
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Check-out the code
-        uses: actions/checkout@v4
-
-      - name: Set-up the Java and Maven
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Build the Application with Artifact
-        run: mvn clean package
-
-      - name: Display the files
-        run: ls -lrth target/
-
-      - name: Upload the Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: maven-war
-          path: target
-
-  Test-Stage:
-    runs-on: ubuntu-latest
-    needs: Build-Stage
-
-    steps:
-      - name: Check-out the code
-        uses: actions/checkout@v4
-
-      - name: Set-up the java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Test the Artifact
-        run: mvn test
-
-      - name: Status of Test Artifact
-        run: echo "Successfully the test artifact is done"
-
-  Deploy-Stage:
-    runs-on: ubuntu-latest
-    needs: Test-Stage
-
-    steps:
-      - name: Download the Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: maven-war
-          path: target
-
-      - name: Display the donwload the Artifact
-        run: ls -lrth target/
-
-      - name: Deploy the Application
-        env:
-          TOMCAT_URL: http://3.110.120.221:8080
-          TOMCAT_USER: anil
-          TOMCAT_PASS: password
-
-        run: |
-          WAR_FILE=$(ls target/*.war | head -n 1)
-
-          curl -u "$TOMCAT_USER:$TOMCAT_PASS" \
-          --upload-file "$WAR_FILE" \
-          "$TOMCAT_URL/manager/text/deploy?path=/maven-web-application&update=true"
-          
-      - name: Status of Deploy the Application
-        run: |
-          echo "Successfully deploy the Application done."
-
-  SonarQube:
-    runs-on: ubuntu-latest
-    needs: Deploy-Stage
 
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
 
-      - name: Set-up Java
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build Application
+        run: mvn clean package
+
+      - name: Display Artifact
+        run: ls -lrth target/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-war
+          path: target/*.war
+
+#=========================================
+# TEST STAGE
+#=========================================
+  Test-Stage:
+    runs-on: ubuntu-latest
+    needs: Build-Stage
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Execute Test Cases
+        run: mvn test
+
+      - name: Test Status
+        run: echo "Tests Completed Successfully"
+
+#=========================================
+# SONARQUBE STAGE
+#=========================================
+  SonarQube:
+    runs-on: ubuntu-latest
+    needs: Test-Stage
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -101,14 +81,19 @@ jobs:
             -Dsonar.login=admin \
             -Dsonar.password=apple
 
+#=========================================
+# NEXUS STAGE
+#=========================================
   Nexus:
     runs-on: ubuntu-latest
     needs: SonarQube
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout the code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
@@ -116,7 +101,9 @@ jobs:
       - name: Configure Maven Settings
         run: |
           mkdir -p ~/.m2
+
           cat > ~/.m2/settings.xml <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
           <settings>
             <servers>
               <server>
@@ -128,19 +115,38 @@ jobs:
           </settings>
           EOF
 
-      - name: Deploy to Nexus
+      - name: Deploy Artifact to Nexus
         run: mvn clean deploy
 
-          
+#=========================================
+# TOMCAT DEPLOYMENT
+#=========================================
+  Deploy-Stage:
+    runs-on: ubuntu-latest
+    needs: Nexus
 
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-war
+          path: target
 
+      - name: Display Artifact
+        run: ls -lrth target/
 
+      - name: Deploy to Tomcat
+        env:
+          TOMCAT_URL: http://3.110.120.221:8080
+          TOMCAT_USER: anil
+          TOMCAT_PASS: password
 
+        run: |
+          WAR_FILE=$(find target -name "*.war" | head -1)
 
+          curl -u "$TOMCAT_USER:$TOMCAT_PASS" \
+            --upload-file "$WAR_FILE" \
+            "$TOMCAT_URL/manager/text/deploy?path=/maven-web-application&update=true"
 
-
-
-
-
-
-        
+      - name: Deployment Status
+        run: echo "Application Successfully Deployed to Tomcat"
