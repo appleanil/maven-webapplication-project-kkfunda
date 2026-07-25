@@ -1,0 +1,57 @@
+name: Docker CICD
+
+on: workflow_dispatch
+
+jobs:
+  Build-Stage:
+    runs-on: anil
+
+    steps:
+      - name: Check the Code
+        uses: actions/checkout@v4
+
+      - name: Setup the Java and Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Install the Maven
+        run: |
+          sudo apt update -y
+          sudo apt install maven -y
+
+      - name: Run the Goal
+        run: mvn clean package
+
+      - name: Display the War file
+        run: |
+          ls -l target/
+
+      - name: Upload the Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-war
+          path: target/*.war
+
+  Test-Stage:
+    runs-on: anil
+    needs: Build-Stage
+
+    steps:
+      - name: Check the Code
+        uses: actions/checkout@v4
+
+      - name: Setup the Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Execute the Test Goal
+        run: mvn test
+
+      - name: Status of Test
+        run: echo "All test cases passed successfully."
