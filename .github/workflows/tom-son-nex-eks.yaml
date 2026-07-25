@@ -75,11 +75,11 @@ jobs:
 
       - name: SonarQube Scan
         run: |
-          mvn sonar:sonar \
-            -Dsonar.projectKey=maven-web-application \
-            -Dsonar.projectName="Maven Web Application" \
-            -Dsonar.host.url=http://3.7.68.144:9000/ \
-            -Dsonar.login=apple
+          mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=maven-web-application \
+          -Dsonar.projectName="Maven Web Application" \
+          -Dsonar.host.url=http://3.7.68.144:9000 \
+          -Dsonar.login=squ_e9f1628cd5a3b03023608531077dc596dde0d6da
 
       - name: SonarQube Analysis Completed
         run: echo "SonarQube Scan Successful"
