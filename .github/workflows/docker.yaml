@@ -17,11 +17,6 @@ jobs:
           java-version: 17
           cache: maven
 
-      - name: Install the Maven
-        run: |
-          sudo apt update -y
-          sudo apt install maven -y
-
       - name: Run the Goal
         run: mvn clean package
 
