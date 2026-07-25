@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
   Build-Stage:
-    runs-on: anil
+    runs-on: self-hosted
 
     steps:
       - name: Check the Code
@@ -36,7 +36,7 @@ jobs:
           path: target/*.war
 
   Test-Stage:
-    runs-on: anil
+    runs-on: self-hosted
     needs: Build-Stage
 
     steps:
