@@ -9,9 +9,7 @@ jobs:
 # BUILD STAGE
 #=========================================
   Build-Stage:
-    runs-on: 
-        - self-hosted
-        - linux
+    runs-on: self-hosted
 
     steps:
       - name: Checkout the Code
@@ -22,6 +20,12 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+          cache: maven
+
+      - name: Install Maven
+        run: |
+          sudo apt update -y
+          sudo apt install maven -y
 
       - name: Build Application
         run: mvn clean package
@@ -39,9 +43,7 @@ jobs:
 # TEST STAGE
 #=========================================
   Test-Stage:
-    runs-on: 
-        - self-hosted
-        - linux
+    runs-on: self-hosted
     needs: Build-Stage
 
     steps:
@@ -64,9 +66,7 @@ jobs:
 # SONARQUBE ANALYSIS
 #=========================================
   Sonarqube:
-    runs-on: 
-        - self-hosted
-        - linux
+    runs-on: self-hosted
     needs: Test-Stage
 
     steps:
