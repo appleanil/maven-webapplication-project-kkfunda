@@ -57,41 +57,31 @@ jobs:
         run: echo "Tests Completed Successfully"
 
 #=========================================
-# DOCKER BUILD & PUSH
+# SONARQUBE ANALYSIS
 #=========================================
-  Docker-Build:
+  SonarQube-Analysis:
     runs-on: self-hosted
-    needs: Test-Stage
+    needs: Build-Stage
 
     steps:
       - name: Checkout the Code
         uses: actions/checkout@v4
 
-      - name: Download WAR
-        uses: actions/download-artifact@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          name: maven-war
-          path: target
+          distribution: temurin
+          java-version: 17
 
-      - name: Debug Runner
+      - name: SonarQube Scan
         run: |
-            whoami
-            id
-            groups
-            ls -l /var/run/docker.sock
-            docker version   
+          mvn sonar:sonar \
+            -Dsonar.projectKey=maven-web-application \
+            -Dsonar.projectName="Maven Web Application" \
+            -Dsonar.host.url=http://3.7.68.144:9000/ \
+            -Dsonar.login=apple
 
-      - name: Verify WAR
-        run: ls -lrth target/
+      - name: SonarQube Analysis Completed
+        run: echo "SonarQube Scan Successful"
 
-      - name: Build Docker Image
-        run: |
-          docker build -t anildocker11/maven-web-application:latest .
-
-      - name: Verify Docker Image
-        run: |
-          docker images
-
-      - name: Push Docker Image
-        run: |
-          docker push anildocker11/maven-web-application:latest
+        
