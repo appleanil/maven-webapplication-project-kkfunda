@@ -10,7 +10,7 @@ jobs:
 #=========================================
   Build-Stage:
     runs-on: 
-        - self-hosted1
+        - self-hosted
         - linux
 
     steps:
@@ -40,7 +40,7 @@ jobs:
 #=========================================
   Test-Stage:
     runs-on: 
-        - self-hosted1
+        - self-hosted
         - linux
     needs: Build-Stage
 
@@ -65,7 +65,7 @@ jobs:
 #=========================================
   Sonarqube:
     runs-on: 
-        - self-hosted1
+        - self-hosted
         - linux
     needs: Test-Stage
 
