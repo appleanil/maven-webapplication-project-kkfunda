@@ -55,3 +55,11 @@ jobs:
 
       - name: Status of Test
         run: echo "All test cases passed successfully."
+
+  Sonarqube:
+    runs-on: self-hosted
+    needs: Test-Stage
+
+    steps:
+      - name: SonarQube
+        run: mvn sonar:sonar
