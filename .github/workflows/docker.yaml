@@ -67,3 +67,5 @@ jobs:
         run: |
           mvn sonar:sonar \
             -Dsonar.host.url=http://15.206.194.28:9000
+            -Dsonar.projectKey=maven-webapplication-project-kkfunda \
+            -Dsonar.token=squ_72c4daaa1bddc59c6e4aae33720cc902cef5ee2e
