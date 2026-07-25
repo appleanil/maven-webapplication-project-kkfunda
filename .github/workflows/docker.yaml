@@ -75,6 +75,21 @@ jobs:
     needs: Sonarqube
 
     steps:
+
+      - name: Check the Code
+        uses: actions/checkout@v4
+
+      - name: Download the Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-war
+          path: target
+
+      - name: Display the war file
+        run: |
+          ls -l target/
+          pwd
+          
       - name: Docker Build the image
         run: |
           docker build -t anildocker11/maven-docker-kastom:0.0.1 .
