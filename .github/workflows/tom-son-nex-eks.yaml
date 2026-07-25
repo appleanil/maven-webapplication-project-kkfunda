@@ -9,7 +9,7 @@ jobs:
 # BUILD STAGE
 #=========================================
   Build-Stage:
-    runs-on: self runner
+    runs-on: self-hosted
 
     steps:
       - name: Checkout the Code
@@ -37,7 +37,7 @@ jobs:
 # TEST STAGE
 #=========================================
   Test-Stage:
-    runs-on: self runner
+    runs-on: self-hosted
     needs: Build-Stage
 
     steps:
@@ -60,7 +60,7 @@ jobs:
 # SONARQUBE ANALYSIS
 #=========================================
   SonarQube-Analysis:
-    runs-on: self runner
+    runs-on: self-hosted
     needs: Test-Stage
 
     steps:
