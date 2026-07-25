@@ -61,7 +61,7 @@ jobs:
 #=========================================
   SonarQube-Analysis:
     runs-on: self-hosted
-    needs: Build-Stage
+    needs: Test-Stage
 
     steps:
       - name: Checkout the Code
