@@ -1,0 +1,85 @@
+name: Docker-CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+#=========================================
+# BUILD STAGE
+#=========================================
+  Build-Stage:
+    runs-on: self-hosted1
+
+    steps:
+      - name: Checkout the Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build Application
+        run: mvn clean package
+
+      - name: Display Artifact
+        run: ls -lrth target/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-war
+          path: target/*.war
+
+#=========================================
+# TEST STAGE
+#=========================================
+  Test-Stage:
+    runs-on: self-hosted1
+    needs: Build-Stage
+
+    steps:
+      - name: Checkout the Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Run Unit Tests
+        run: mvn test
+
+      - name: Test Status
+        run: echo "Tests Completed Successfully"
+
+#=========================================
+# SONARQUBE ANALYSIS
+#=========================================
+  SonarQube-Analysis:
+    runs-on: self-hosted1
+    needs: Test-Stage
+
+    steps:
+      - name: Checkout the Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: SonarQube Scan
+        run: |
+          mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.projectKey=maven-web-application \
+          -Dsonar.projectName="Maven Web Application" \
+          -Dsonar.host.url=http://3.7.68.144:9000 \
+          -Dsonar.login=squ_e9f1628cd5a3b03023608531077dc596dde0d6da
+
+      - name: SonarQube Analysis Completed
+        run: echo "SonarQube Scan Successful"
