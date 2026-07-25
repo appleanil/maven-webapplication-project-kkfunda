@@ -1,0 +1,99 @@
+name: Docker CICD
+
+on: workflow_dispatch
+
+jobs:
+  Build-Stage:
+    runs-on: self-hosted
+
+    steps:
+      - name: Check the Code
+        uses: actions/checkout@v4
+
+      - name: Setup the Java and Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Run the Goal
+        run: mvn clean package
+
+      - name: Display the War file
+        run: |
+          ls -l target/
+
+      - name: Upload the Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-war
+          path: target/*.war
+
+  Test-Stage:
+    runs-on: self-hosted
+    needs: Build-Stage
+
+    steps:
+      - name: Check the Code
+        uses: actions/checkout@v4
+
+      - name: Setup the Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Execute the Test Goal
+        run: mvn test
+
+      - name: Status of Test
+        run: echo "All test cases passed successfully."
+
+  Sonarqube:
+    runs-on: self-hosted
+    needs: Test-Stage
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: SonarQube Scan
+        run: |
+          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+            -Dsonar.host.url=http://15.206.194.28:9000 \
+            -Dsonar.projectKey=maven-webapplication-project-kkfunda \
+            -Dsonar.token=squ_72c4daaa1bddc59c6e4aae33720cc902cef5ee2e
+
+  Docker-Push:
+    runs-on: self-hosted
+    needs: Sonarqube
+
+    steps:
+
+      - name: Check the Code
+        uses: actions/checkout@v4
+
+      - name: Download the Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-war
+          path: target
+
+      - name: Display the war file
+        run: |
+          ls -l target/
+          pwd
+          
+      - name: Docker Build the image
+        run: |
+          docker build -t anildocker11/maven-docker-kastom:0.0.1 .
+
+      - name: Docker push the image into DockerHub
+        run: |
+          docker push anildocker11/maven-docker-kastom:0.0.1
