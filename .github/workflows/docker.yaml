@@ -61,5 +61,14 @@ jobs:
     needs: Test-Stage
 
     steps:
-      - name: SonarQube
-        run: mvn sonar:sonar
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: SonarQube Scan
+        run: |
+          mvn sonar:sonar \
+            -Dsonar.host.url=http://15.206.194.28:9000
