@@ -68,7 +68,7 @@ jobs:
 
       - name: Deploy into Tomcat Application
         run: |
-          WAR_FILE=(find target -name "*.war" | head -1)
+          WAR_FILE=$(find target -name "*.war" | head -1)
 
           echo "Deploying: $WAR_FILE"
           
