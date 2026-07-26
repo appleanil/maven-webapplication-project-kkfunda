@@ -71,7 +71,7 @@ jobs:
 
           curl -v -u "admin:apple" \
             --upload-file "$WAR_FILE" \
-            "http://43.204.219.200:8081/repository/maven-releases/com/example/maven-web-application/1.0/maven-web-application-1.0.war"
+            "http://43.204.219.200:8081/repository/Jio-Snapshot/com/example/maven-web-application/1.0/maven-web-application-1.0.war"
 
       - name: Upload Status
         run: echo "WAR file uploaded successfully to Nexus Repository."
