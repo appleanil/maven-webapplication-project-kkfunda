@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: maven-nexus-docker-container
-          image: anildocker11/maven-nexus-docker:0.0.1
+          image: anildocker11/springwebapp:0.0.1
           ports:
             - containerPort: 8080
 
@@ -46,4 +46,4 @@ spec:
   ports:
     - port: 8080
       targetPort: 8080
-      nodePort: 32100
+      nodePort: 32101
