@@ -49,6 +49,33 @@ jobs:
       - name: Status of the gaol
         run: echo "All Test cases are successfully passed"
 
+  Nexus-Stage:
+    runs-on: self-hosted
+    needs: Build-Stage
+
+    steps:
+      - name: Download WAR Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-war
+          path: target
+
+      - name: Display WAR File
+        run: ls -l target/
+
+      - name: Upload WAR to Nexus Repository
+        run: |
+          WAR_FILE=$(find target -name "*.war" | head -1)
+
+          echo "Uploading $WAR_FILE to Nexus Repository..."
+
+          curl -v -u "admin:apple" \
+            --upload-file "$WAR_FILE" \
+            "http://43.204.219.200:8081/repository/maven-releases/com/example/maven-web-application/1.0/maven-web-application-1.0.war"
+
+      - name: Upload Status
+        run: echo "WAR file uploaded successfully to Nexus Repository."
+
   
 
 
