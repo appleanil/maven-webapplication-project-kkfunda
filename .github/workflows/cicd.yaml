@@ -51,7 +51,7 @@ jobs:
 
       - name: Deployment the Application
         run: |
-          kubectl apply -f Kubernetes/deployment.yaml
+          kubectl apply -f kubernetes/deployment.yaml
 
       - name: Status of Deployment Application
         run: |
