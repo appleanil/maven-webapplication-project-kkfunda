@@ -62,7 +62,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-          cache: maven
+          cache: nexus
+          server-id: nexus
+          server-username: admin
+          server-password: apple
 
       - name: Deploy Artifact to Nexus
         run: mvn clean deploy
