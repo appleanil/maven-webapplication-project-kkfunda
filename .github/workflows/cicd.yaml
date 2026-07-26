@@ -127,4 +127,38 @@ jobs:
       - name: Docker status
         run: echo "Docker buil, push all things done successfully."
 
+  Kubernetes-EKS-Stage:
+    runs-on: self-hosted
+    needs: Docker-Stage
+
+    steps:
+      - name: Check out the Code
+        uses: actions/checkout@v4
+
+      - name: Configure kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region ap-south-1 \
+            --name my-k8s-cluster
+
+      - name: Verify the EKS Cluster
+        run: |
+          kubectl get nodes
+          kubectl get ns
+
+      - name: Create a NameSpace
+        run: kubectl create ns anil
+
+      - name: Deployment the Application
+        run: |
+          kubectl apply -f dep.yaml
+
+      - name: Status of Deployment Application
+        run: |
+          kubectl get deployment
+          kubectl get svc
+          kubectl get po
+          kubectl get all
+
+
           
