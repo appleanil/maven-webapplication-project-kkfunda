@@ -51,7 +51,7 @@ jobs:
 
   Nexus-Stage:
     runs-on: self-hosted
-    needs: Build-Stage
+    needs: Test-Stage
 
     steps:
       - name: Download WAR Artifact
@@ -75,21 +75,3 @@ jobs:
 
       - name: Upload Status
         run: echo "WAR file uploaded successfully to Nexus Repository."
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
