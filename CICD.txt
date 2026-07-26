@@ -149,3 +149,33 @@ jobs:
 
       - name: Push Docker Image
         run: docker push anildocker11/maven-docker-kastom:0.0.1
+
+  Kubernetes-EKS-Stage:
+    runs-on: self-hosted
+    needs: Build-Stage
+
+    steps:
+      - name: Check out the Code
+        uses: actions/checkout@v4
+
+      - name: Configure kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region ap-south-1 \
+            --name my-k8s-cluster
+
+      - name: Verify the EKS Cluster
+        run: |
+          kubectl get nodes
+          kubectl get ns
+
+      - name: Deployment the Application
+        run: |
+          kubectl apply -f deployment.yaml    #if we are using path then mention like.github/dep.yaml kubernetes/workflows/dep.yaml
+
+      - name: Status of Deployment Application
+        run: |
+          kubectl get deployment
+          kubectl get svc
+          kubectl get po
+          kubectl get all
