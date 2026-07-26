@@ -61,16 +61,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: maven-war
-          path: target/*.war
+          path: target
 
       - name: Display the Artifact
         run: ls -l target/
 
       - name: Deploy into Tomcat Application
         run: |
-          WAR_FILE=$(ls target/*.war | head -n 1)
+          WAR_FILE=(find target -name "*.war" | head -1)
 
-          curl -u "admin:admin" \
+          echo "Deploying: $WAR_FILE"
+          
+          curl -v -u "admin:admin" \
           --upload-file "$WAR_FILE" \
           "http://43.204.219.200:8080/manager/text/deploy?path=/maven-web-application&update=true"
 
