@@ -1,0 +1,92 @@
+name: Tom Son Nex Doc EKS
+
+on: workflow_dispatch
+
+jobs:
+  Build-Stage:
+    runs-on: self-hosted
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Setup the Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Run the Goal
+        run: mvn clean package
+
+      - name: Display the war file
+        run: ls -l target/
+
+      - name: Upload the Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maven-war
+          path: target/*.war
+
+  Test-Stage:
+    runs-on: self-hosted
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Setup the java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Run the Test Goal
+        run: mvn test
+
+      - name: Status of the gaol
+        run: echo "All Test cases are successfully passed"
+
+  Deploy-Tomcat:
+    runs-on: self-hosted
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Download the Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-war
+          path: target/*.war
+
+      - name: Display the Artifact
+        run: ls -l target/
+
+      - name: Deploy into Tomcat Application
+        run: |
+          WAR_FILE=$(ls target/*.war | head -n 1)
+
+          curl -u "${{ secrets.TOMCAT_USERNAME }}:${{ secrets.TOMCAT_PASSWORD }}" \
+          --upload-file "$WAR_FILE" \
+          "${{ secrets.TOMCAT_URL }}/manager/text/deploy?path=/maven-web-application&update=true"
+
+      - name: Status of war file
+        run: echo "Application successfully deployed into Tomcat."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
