@@ -63,9 +63,25 @@ jobs:
           distribution: temurin
           java-version: 17
           cache: maven
-          server-id: nexus
-          server-username: admin
-          server-password: apple
+
+      - name: Create Maven settings.xml
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>nexus</id>
+                <username>admin</username>
+                <password>apple</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+
+      - name: Verify settings.xml
+        run: |
+          cat ~/.m2/settings.xml
 
       - name: Deploy Artifact to Nexus
         run: mvn clean deploy
