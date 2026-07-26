@@ -31,6 +31,7 @@ jobs:
 
   Test-Stage:
     runs-on: self-hosted
+    needs: Build-Stage
 
     steps:
       - name: Check out the code
@@ -50,6 +51,7 @@ jobs:
 
   Deploy-Tomcat:
     runs-on: self-hosted
+    needs: Test-Stage
 
     steps:
       - name: Check out the code
