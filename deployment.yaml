@@ -1,36 +1,48 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: javawebappdep
-  namespace: test-ns
+  name: anil-dep
+  namespace: anil
+  labels:
+    app: dep
+    env: prod
+    createdBy: anilkumar
+
 spec:
   replicas: 2
-  strategy:
-    type: Recreate
+
   selector:
     matchLabels:
-      app: javawebapp
+      app: dep
+
   template:
     metadata:
-      name: javawebapp
       labels:
-        app: javawebapp
+        app: dep
+
     spec:
       containers:
-      - name: javawebapp
-        image: kkeducation12345/spring-app:1.0.5
-        ports:
-        - containerPort: 8080
+        - name: maven-nexus-docker-container
+          image: anildocker11/maven-nexus-docker:0.0.1
+          ports:
+            - containerPort: 8080
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: javawebappsvc
-  namespace: test-ns
+  name: anil-dep-svc
+  namespace: anil
+  labels:
+    app: dep
+    env: prod
+
 spec:
-  type: NodePort
   selector:
-    app: javawebapp
+    app: dep
+
+  type: LoadBalancer
+
   ports:
-  - port: 80
-    targetPort: 8080
+    - port: 80
+      targetPort: 8080
