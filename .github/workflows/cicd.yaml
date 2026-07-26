@@ -49,49 +49,6 @@ jobs:
       - name: Status of the gaol
         run: echo "All Test cases are successfully passed"
 
-  Nexus-Stage:
-    runs-on: self-hosted
-    needs: Test-Stage
-
-    env:
-      NEXUS_USERNAME: admin
-      NEXUS_PASSWORD: apple
-
-    steps:
-      - name: Check out the code
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: maven
-
-      - name: Create Maven settings.xml
-        run: |
-          mkdir -p ~/.m2
-          cat > ~/.m2/settings.xml <<EOF
-          <settings>
-            <servers>
-            <server>
-              <id>nexus</id>
-              <username>${NEXUS_USERNAME}</username>
-              <password>${NEXUS_PASSWORD}</password>
-            </server>
-          </servers>
-          </settings>
-          EOF
-
-      - name: Verify settings.xml
-        run: cat ~/.m2/settings.xml
-
-      - name: Deploy Artifact to Nexus
-        run: mvn clean deploy
-
-      - name: Upload Status
-        run: echo "WAR file uploaded successfully to Nexus Repository."
-
   Docker-Stage:
     runs-on: self-hosted
     needs: Nexus-Stage
