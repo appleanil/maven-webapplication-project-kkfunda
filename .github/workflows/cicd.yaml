@@ -29,44 +29,10 @@ jobs:
           name: maven-war
           path: target/*.war
 
-  Docker-Stage:
-    runs-on: self-hosted
-    needs: Build-Stage
-
-    steps:
-      - name: Check the Code
-        uses: actions/checkout@v4
-        
-      - name: Setup the Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-          cache: maven
-
-      - name: Download the Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: maven-war
-          path: target
-
-      - name: Display the Artifact
-        run: |
-          pwd
-          ls -l target/
-
-      - name: Docker Built the image
-        run: docker build -t anildocker11/maven-nexus-docker:0.0.1 .
-
-      - name: Docker Push the DockerHub
-        run: docker push anildocker11/maven-nexus-docker:0.0.1
-
-      - name: Docker status
-        run: echo "Docker buil, push all things done successfully."
-
+  
   Kubernetes-EKS-Stage:
     runs-on: self-hosted
-    needs: Docker-Stage
+    needs: Build-Stage
 
     steps:
       - name: Check out the Code
