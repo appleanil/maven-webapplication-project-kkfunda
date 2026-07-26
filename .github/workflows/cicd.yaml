@@ -83,9 +83,6 @@ jobs:
           kubectl get nodes
           kubectl get ns
 
-      - name: Create a NameSpace
-        run: kubectl create ns anil
-
       - name: Deployment the Application
         run: |
           kubectl apply -f dep.yaml
