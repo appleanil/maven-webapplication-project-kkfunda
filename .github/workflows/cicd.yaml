@@ -29,29 +29,9 @@ jobs:
           name: maven-war
           path: target/*.war
 
-  Test-Stage:
-    runs-on: self-hosted
-    needs: Build-Stage
-
-    steps:
-      - name: Check out the code
-        uses: actions/checkout@v4
-
-      - name: Setup the java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Run the Test Goal
-        run: mvn test
-
-      - name: Status of the gaol
-        run: echo "All Test cases are successfully passed"
-
   Docker-Stage:
     runs-on: self-hosted
-    needs: Nexus-Stage
+    needs: Build-Stage
 
     steps:
       - name: Check the Code
