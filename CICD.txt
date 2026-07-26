@@ -1,8 +1,10 @@
 name: Docker CICD
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
 
 jobs:
+
   Build-Stage:
     runs-on: self-hosted
 
@@ -10,21 +12,20 @@ jobs:
       - name: Check the Code
         uses: actions/checkout@v4
 
-      - name: Setup the Java and Maven
+      - name: Setup Java and Maven
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
           cache: maven
 
-      - name: Run the Goal
+      - name: Build the Project
         run: mvn clean package
 
-      - name: Display the War file
-        run: |
-          ls -l target/
+      - name: Display WAR File
+        run: ls -l target/
 
-      - name: Upload the Artifact
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: maven-war
@@ -38,18 +39,15 @@ jobs:
       - name: Check the Code
         uses: actions/checkout@v4
 
-      - name: Setup the Java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
           cache: maven
 
-      - name: Execute the Test Goal
+      - name: Execute Tests
         run: mvn test
-
-      - name: Status of Test
-        run: echo "All test cases passed successfully."
 
   Sonarqube:
     runs-on: self-hosted
@@ -70,30 +68,84 @@ jobs:
             -Dsonar.projectKey=maven-webapplication-project-kkfunda \
             -Dsonar.token=squ_72c4daaa1bddc59c6e4aae33720cc902cef5ee2e
 
-  Docker-Push:
+  Nexus-Stage:
     runs-on: self-hosted
     needs: Sonarqube
 
-    steps:
+    env:
+      NEXUS_USERNAME: admin
+      NEXUS_PASSWORD: apple
 
+    steps:
       - name: Check the Code
         uses: actions/checkout@v4
 
-      - name: Download the Artifact
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: maven
+
+      - name: Create Maven settings.xml
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>nexus</id>
+                <username>${NEXUS_USERNAME}</username>
+                <password>${NEXUS_PASSWORD}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+
+      - name: Verify settings.xml
+        run: cat ~/.m2/settings.xml
+
+      - name: Deploy Artifact to Nexus
+        run: mvn -s ~/.m2/settings.xml clean deploy
+
+  Deploy-Tomcat:
+    runs-on: self-hosted
+    needs: Nexus-Stage
+
+    steps:
+      - name: Download WAR Artifact
         uses: actions/download-artifact@v4
         with:
           name: maven-war
           path: target
 
-      - name: Display the war file
+      - name: Deploy WAR to Tomcat
         run: |
-          ls -l target/
-          pwd
-          
-      - name: Docker Build the image
-        run: |
-          docker build -t anildocker11/maven-docker-kastom:0.0.1 .
+          WAR_FILE=$(find target -name "*.war" | head -1)
 
-      - name: Docker push the image into DockerHub
-        run: |
-          docker push anildocker11/maven-docker-kastom:0.0.1
+          curl -v -u "admin:admin" \
+            --upload-file "$WAR_FILE" \
+            "http://43.204.219.200:8080/manager/text/deploy?path=/maven-web-application&update=true"
+
+  Docker-Push:
+    runs-on: self-hosted
+    needs: Deploy-Tomcat
+
+    steps:
+      - name: Check the Code
+        uses: actions/checkout@v4
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-war
+          path: target
+
+      - name: Display WAR File
+        run: ls -l target/
+
+      - name: Build Docker Image
+        run: docker build -t anildocker11/maven-docker-kastom:0.0.1 .
+
+      - name: Push Docker Image
+        run: docker push anildocker11/maven-docker-kastom:0.0.1
