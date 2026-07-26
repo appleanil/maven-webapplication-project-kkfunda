@@ -68,9 +68,9 @@ jobs:
         run: |
           WAR_FILE=$(ls target/*.war | head -n 1)
 
-          curl -u "${{ secrets.TOMCAT_USERNAME }}:${{ secrets.TOMCAT_PASSWORD }}" \
+          curl -u "admin:admin" \
           --upload-file "$WAR_FILE" \
-          "${{ secrets.TOMCAT_URL }}/manager/text/deploy?path=/maven-web-application&update=true"
+          "http://43.204.219.200:8080/manager/text/deploy?path=/maven-web-application&update=true"
 
       - name: Status of war file
         run: echo "Application successfully deployed into Tomcat."
